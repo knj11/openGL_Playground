@@ -16,6 +16,7 @@ SET( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /ENTRY:mainCRTStartup" )
 set( openGL_Playground-SRC
         src/main.cpp
         src/glad.c
+        src/stb_image.cpp
 )
 
 add_executable( openGL_Playground ${openGL_Playground-SRC} )
