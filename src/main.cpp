@@ -93,7 +93,7 @@ int main()
     // build and compile our shader program
     // ------------------------------------
     // vertex shader
-    Shader ourShader("shaders\\3.3.shader.vs", "shaders\\3.3.shader.fs"); // you can name your shader files however you like
+    Shader ourShader("shaders\\color_tri_w_X_offset.vert", "shaders\\color_tri.frag"); // you can name your shader files however you like
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
@@ -140,6 +140,9 @@ int main()
 
     // uncomment this call to draw in wireframe polygons.
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    ourShader.use();
+    float offset = 0.5f;
+    ourShader.setFloat("xOffset", offset);
 
     // render loop
     // -----------
@@ -155,7 +158,6 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
 
         // draw our first triangle
-        ourShader.use();
         glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
         glDrawArrays(GL_TRIANGLES, 0, 3);
         // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
