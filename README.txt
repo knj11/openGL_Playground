@@ -7,6 +7,14 @@ pre: git clone --recursive "http link"
 5) cmake --build build
 6) build\space_invaders.exe
 
+Main Learning Resource
+https://learnopengl.com/Introduction
 
 Open GL documentation
 https://registry.khronos.org/OpenGL/specs/gl/glspec33.core.pdf
+
+Standard Image loader
+https://github.com/nothings/stb/tree/master
+
+OpenGL Mathematics
+https://github.com/g-truc/glm/tree/master
