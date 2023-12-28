@@ -6,7 +6,7 @@ set( GLFW_BUILD_DOCS OFF CACHE BOOL  "GLFW lib only" )
 set( GLFW_INSTALL OFF CACHE BOOL  "GLFW lib only" )
 
 add_subdirectory( glfw )
-
+add_subdirectory( glm )
 # include_directories("${GLFW_SOURCE_DIR}/deps")
 # set( GLAD_GL "${GLFW_SOURCE_DIR}/deps/glad/gl.h" )
 include_directories( include )
@@ -21,4 +21,4 @@ set( openGL_Playground-SRC
 
 add_executable( openGL_Playground ${openGL_Playground-SRC} )
 
-target_link_libraries( openGL_Playground glfw )
+target_link_libraries( openGL_Playground glfw glm )
