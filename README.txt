@@ -3,7 +3,7 @@ pre: git clone --recursive "http link"
 - Windows Button -> All Apps -> Visual Studio Folder -> x64 Native Tools Command Prompt Visual Studio 2022
 2) cd to root of project
 3) mkdir build
-4) run "cmake cmake -S . -B build -G "NMake Makefiles"
+4) run "cmake -S . -B build -G "NMake Makefiles"
 5) cmake --build build
 6) build\space_invaders.exe
 
