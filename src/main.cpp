@@ -35,6 +35,19 @@ inline void gl_debug(const char *file, int line) {
 
 #undef GL_ERROR_CASE
 float mixValue = 0.0f;
+
+// settings
+const unsigned int SCR_WIDTH = 800;
+const unsigned int SCR_HEIGHT = 600;
+
+// camera
+glm::vec3 cameraPos   = glm::vec3(0.0f, 0.0f,  3.0f);
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+glm::vec3 cameraUp    = glm::vec3(0.0f, 1.0f,  0.0f);
+
+// timing
+float deltaTime = 0.0f;	// time between current frame and last frame
+float lastFrame = 0.0f;
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
 void processInput(GLFWwindow *window)
@@ -42,18 +55,15 @@ void processInput(GLFWwindow *window)
     if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
     
-    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-    {
-        mixValue += 0.001f; // change this value accordingly (might be too slow or too fast based on system hardware)
-        if(mixValue >= 1.0f)
-            mixValue = 1.0f;
-    }
-    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-    {
-        mixValue -= 0.001f; // change this value accordingly (might be too slow or too fast based on system hardware)
-        if (mixValue <= 0.0f)
-            mixValue = 0.0f;
-    }
+    float cameraSpeed = static_cast<float>(2.5 * deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        cameraPos += cameraSpeed * cameraFront;
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        cameraPos -= cameraSpeed * cameraFront;
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
@@ -64,11 +74,6 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     // height will be significantly larger than specified on retina displays.
     glViewport(0, 0, width, height);
 }
-
-
-// settings
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
 
 int main()
 {
@@ -286,10 +291,20 @@ int main()
     // or set it via the texture class
     ourShader.setInt("texture2", 1);
 
+    // pass projection matrix to shader (as projection matrix rarely changes there's no need to do this per frame)
+    // -----------------------------------------------------------------------------------------------------------
+    glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+    ourShader.setMat4("projection", projection);
+
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window))
     {
+        // per-frame time logic
+        // --------------------
+        float currentFrame = static_cast<float>(glfwGetTime());
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
         // input
         // -----
         processInput(window);
@@ -308,22 +323,9 @@ int main()
         // activate shader
         ourShader.use();
 
-        // create transformations
-        glm::mat4 view          = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
-        glm::mat4 projection    = glm::mat4(1.0f);
-        projection = glm::perspective(glm::radians(45.0f),
-                                      (float)SCR_WIDTH / (float)SCR_HEIGHT,
-                                      0.1f,
-                                      100.0f);
-        view       = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
-        // pass transformation matrices to the shader
-        // note: currently we set the projection matrix each frame, but since
-        // the projection matrix rarely changes it's often best practice to set
-        // it outside the main loop only once.
-        
-        ourShader.setMat4("projection", projection); 
+        // camera/view transformation
+        glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
         ourShader.setMat4("view", view);
-
 
         // render boxes
         glBindVertexArray(VAO);
