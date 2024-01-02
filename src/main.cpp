@@ -263,6 +263,20 @@ int main()
 
     // uncomment this call to draw in wireframe polygons.
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    
+    /** The 5 coordinate systems for transforming 3d space into 2d screen
+     ** Also the transformation matrixes used
+     *
+     * Local space (or Object space)
+     *     Model Matrix
+     * World space
+     *     View Matrix
+     * View space (or Eye space)
+     *     Projection Matrix (orthographic or perspective)
+     * Clip space
+     *     Viewport transform (dont think this is a matrix used on the app side)
+     * Screen space
+     */
 
     // tell opengl for each sampler to which texture unit it belongs to (only has to be done once)
     // -------------------------------------------------------------------------------------------
@@ -297,10 +311,17 @@ int main()
         // create transformations
         glm::mat4 view          = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
         glm::mat4 projection    = glm::mat4(1.0f);
-        projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        projection = glm::perspective(glm::radians(45.0f),
+                                      (float)SCR_WIDTH / (float)SCR_HEIGHT,
+                                      0.1f,
+                                      100.0f);
         view       = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
         // pass transformation matrices to the shader
-        ourShader.setMat4("projection", projection); // note: currently we set the projection matrix each frame, but since the projection matrix rarely changes it's often best practice to set it outside the main loop only once.
+        // note: currently we set the projection matrix each frame, but since
+        // the projection matrix rarely changes it's often best practice to set
+        // it outside the main loop only once.
+        
+        ourShader.setMat4("projection", projection); 
         ourShader.setMat4("view", view);
 
 
@@ -312,15 +333,13 @@ int main()
             glm::mat4 model = glm::mat4(1.0f);
             model = glm::translate(model, cubePositions[i]);
             float angle = 20.0f * i;
-            model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+            model = glm::rotate(model, glm::radians(angle),
+                                glm::vec3(1.0f, 0.3f, 0.5f));
             ourShader.setMat4("model", model);
 
+            /* 36 = (6 faces * 2 triangles * 3 vertices each) */
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
-
-        // render container
-        glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
